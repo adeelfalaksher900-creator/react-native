@@ -100,6 +100,31 @@ describe('VirtualizedSectionList', () => {
     expect(component).toMatchSnapshot();
   });
 
+  it.each(['list', 'grid'] as const)(
+    'forwards accessibilityRole="%s" and accessibilityLabel to the scroll view',
+    async role => {
+      let component;
+      await ReactTestRenderer.act(() => {
+        component = ReactTestRenderer.create(
+          <VirtualizedSectionList
+            accessibilityRole={role}
+            accessibilityLabel="My sections"
+            // $FlowFixMe[incompatible-type]
+            sections={[{title: 's1', data: [{key: 'i1'}]}]}
+            getItem={(data, key) => data[key]}
+            getItemCount={data => data.length}
+            renderItem={({item}) => <item value={item.key} />}
+          />,
+        );
+      });
+      // $FlowFixMe[incompatible-use] component is assigned before use inside act()
+      expect(removeOwner(component.toJSON())).toMatchObject({
+        type: 'RCTScrollView',
+        props: {accessibilityRole: role, accessibilityLabel: 'My sections'},
+      });
+    },
+  );
+
   it('renders all the bells and whistles', async () => {
     let component;
     await ReactTestRenderer.act(() => {
