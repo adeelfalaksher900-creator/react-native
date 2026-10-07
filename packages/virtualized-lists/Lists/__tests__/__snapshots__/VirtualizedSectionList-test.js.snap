@@ -1118,6 +1118,82 @@ exports[`VirtualizedSectionList renders empty list with empty component 1`] = `
 </RCTScrollView>
 `;
 
+exports[`VirtualizedSectionList renders list with custom collectionName 1`] = `
+<RCTScrollView
+  data={
+    Array [
+      Object {
+        "items": Array [
+          Object {
+            "key": "i1",
+          },
+          Object {
+            "key": "i2",
+          },
+          Object {
+            "key": "i3",
+          },
+        ],
+        "title": "s1",
+      },
+    ]
+  }
+  getItem={[Function]}
+  getItemCount={[Function]}
+  keyExtractor={[Function]}
+  onContentSizeChange={[Function]}
+  onLayout={[Function]}
+  onMomentumScrollBegin={[Function]}
+  onMomentumScrollEnd={[Function]}
+  onScroll={[Function]}
+  onScrollBeginDrag={[Function]}
+  onScrollEndDrag={[Function]}
+  renderItem={[Function]}
+  scrollEventThrottle={0.0001}
+  stickyHeaderIndices={Array []}
+>
+  <View>
+    <View
+      onFocusCapture={[Function]}
+      onLayout={[Function]}
+      style={null}
+    />
+    <View
+      onFocusCapture={[Function]}
+      onLayout={[Function]}
+      style={null}
+    >
+      <item
+        value="i1"
+      />
+    </View>
+    <View
+      onFocusCapture={[Function]}
+      onLayout={[Function]}
+      style={null}
+    >
+      <item
+        value="i2"
+      />
+    </View>
+    <View
+      onFocusCapture={[Function]}
+      onLayout={[Function]}
+      style={null}
+    >
+      <item
+        value="i3"
+      />
+    </View>
+    <View
+      onFocusCapture={[Function]}
+      onLayout={[Function]}
+      style={null}
+    />
+  </View>
+</RCTScrollView>
+`;
+
 exports[`VirtualizedSectionList renders list with empty component 1`] = `
 <RCTScrollView
   ListEmptyComponent={[Function]}

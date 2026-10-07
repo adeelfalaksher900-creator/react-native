@@ -67,6 +67,10 @@ type OptionalVirtualizedSectionListProps<
   SectionT = DefaultVirtualizedSectionT,
 > = {
   /**
+   * The name of the property in section objects containing the items array. Defaults to 'data'.
+   */
+  collectionName?: ?string,
+  /**
    * Default renderer for every item in every section.
    */
   renderItem?: (info: {
@@ -137,10 +141,18 @@ class VirtualizedSectionList<
   VirtualizedSectionListProps<ItemT, SectionT>,
   State,
 > {
+  _getSectionData(section: any): any {
+    const collectionName = this.props.collectionName ?? 'data';
+    return section[collectionName];
+  }
+
   scrollToLocation(params: ScrollToLocationParamsType) {
     let index = params.itemIndex + 1;
     for (let i = 0; i < params.sectionIndex; i++) {
-      index += this.props.getItemCount(this.props.sections[i].data) + 2;
+      index +=
+        this.props.getItemCount(
+          this._getSectionData(this.props.sections[i]),
+        ) + 2;
     }
     let viewOffset = params.viewOffset || 0;
     if (this._listRef == null) {
@@ -174,6 +186,7 @@ class VirtualizedSectionList<
 
   render(): React.Node {
     const {
+      collectionName: _collectionName,
       ItemSeparatorComponent, // don't pass through, rendered with renderItem
       SectionSeparatorComponent,
       renderItem: _renderItem,
@@ -199,7 +212,7 @@ class VirtualizedSectionList<
 
       // Add two for the section header and footer.
       itemCount += 2;
-      itemCount += this.props.getItemCount(section.data);
+      itemCount += this.props.getItemCount(this._getSectionData(section));
     }
     const renderItem = this._renderItem(itemCount);
 
@@ -235,7 +248,7 @@ class VirtualizedSectionList<
     let itemIdx = index - 1;
     for (let i = 0; i < sections.length; i++) {
       const section = sections[i];
-      const sectionData = section.data;
+      const sectionData = this._getSectionData(section);
       const itemCount = props.getItemCount(sectionData);
       if (itemIdx === -1 || itemIdx === itemCount) {
         // We intend for there to be overflow by one on both ends of the list.
@@ -277,7 +290,7 @@ class VirtualizedSectionList<
     const {getItem, getItemCount, keyExtractor, sections} = this.props;
     for (let i = 0; i < sections.length; i++) {
       const section = sections[i];
-      const sectionData = section.data;
+      const sectionData = this._getSectionData(section);
       const key = section.key || String(i);
       itemIndex -= 1; // The section adds an item for the header
       if (itemIndex >= getItemCount(sectionData) + 1) {
@@ -458,7 +471,8 @@ class VirtualizedSectionList<
     const {SectionSeparatorComponent} = this.props;
     const isLastItemInList = index === listItemCount - 1;
     const isLastItemInSection =
-      info.index === this.props.getItemCount(info.section.data) - 1;
+      info.index ===
+        this.props.getItemCount(this._getSectionData(info.section)) - 1;
     if (SectionSeparatorComponent && isLastItemInSection) {
       return SectionSeparatorComponent;
     }
