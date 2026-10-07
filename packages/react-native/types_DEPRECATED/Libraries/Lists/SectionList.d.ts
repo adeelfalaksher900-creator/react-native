@@ -72,6 +72,11 @@ export interface SectionListProps<
   SectionT = DefaultSectionT,
 > extends VirtualizedListWithoutPreConfiguredProps<ItemT> {
   /**
+   * The name of the property in section objects containing the items array. Defaults to 'data'.
+   */
+  collectionName?: string | undefined;
+
+  /**
    * Rendered in between each section.
    */
   SectionSeparatorComponent?:

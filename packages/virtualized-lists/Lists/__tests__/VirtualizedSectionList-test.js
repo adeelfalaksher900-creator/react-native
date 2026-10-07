@@ -31,6 +31,26 @@ function removeOwner(obj: unknown): unknown {
 }
 
 describe('VirtualizedSectionList', () => {
+  it('renders list with custom collectionName', async () => {
+    let component;
+    await ReactTestRenderer.act(() => {
+      component = ReactTestRenderer.create(
+        <VirtualizedSectionList
+          collectionName="items"
+          sections={[
+            // $FlowFixMe[incompatible-type]
+            {title: 's1', items: [{key: 'i1'}, {key: 'i2'}, {key: 'i3'}]},
+          ]}
+          // $FlowFixMe[missing-local-annot]
+          renderItem={({item}) => <item value={item.key} />}
+          getItem={(data, key) => data[key]}
+          getItemCount={data => data.length}
+        />,
+      );
+    });
+    expect(component).toMatchSnapshot();
+  });
+
   it('renders simple list', async () => {
     let component;
     await ReactTestRenderer.act(() => {
@@ -220,7 +240,9 @@ describe('VirtualizedSectionList', () => {
 
     const createVirtualizedSectionList = async (props?: {
       stickySectionHeadersEnabled?: boolean,
-      sections?: Array<SectionBase<{key: string}>>,
+      collectionName?: string,
+      // $FlowFixMe[unclear-type]
+      sections?: Array<any>,
       getItemLayout?: (
         data: unknown,
         index: number,
@@ -463,6 +485,25 @@ describe('VirtualizedSectionList', () => {
           },
         ] as Array<SectionBase<{key: string}>>,
         getItemLayout: undefined,
+      });
+      // $FlowFixMe[prop-missing] scrollToLocation not on instance
+      instance?.scrollToLocation({sectionIndex: 1, itemIndex: 0});
+      // section 0: 2 items + header/footer = 4, so first item of section 1 is at 1 + 4 = 5
+      expect(spy).toHaveBeenCalledWith({
+        index: 5,
+        itemIndex: 0,
+        sectionIndex: 1,
+        viewOffset: 0,
+      });
+    });
+
+    it('scrollToLocation works with custom collectionName', async () => {
+      const {instance, spy} = await createVirtualizedSectionList({
+        collectionName: 'customData',
+        sections: [
+          {title: 's1', customData: [{key: 'a1'}, {key: 'a2'}]},
+          {title: 's2', customData: [{key: 'b1'}, {key: 'b2'}, {key: 'b3'}]},
+        ],
       });
       // $FlowFixMe[prop-missing] scrollToLocation not on instance
       instance?.scrollToLocation({sectionIndex: 1, itemIndex: 0});
