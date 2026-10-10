@@ -74,10 +74,12 @@ void ImageResponseObserverCoordinator::nativeImageResponseProgress(
     int64_t loaded,
     int64_t total) const {
   mutex_.lock();
+  if (status_ == ImageResponse::Status::Cancelled) {
+    mutex_.unlock();
+    return;
+  }
   auto observers = observers_;
-  react_native_assert(
-      status_ == ImageResponse::Status::Loading ||
-      status_ == ImageResponse::Status::Cancelled);
+  react_native_assert(status_ == ImageResponse::Status::Loading);
   mutex_.unlock();
 
   for (const auto& observer : observers) {
@@ -88,11 +90,13 @@ void ImageResponseObserverCoordinator::nativeImageResponseProgress(
 void ImageResponseObserverCoordinator::nativeImageResponseComplete(
     const ImageResponse& imageResponse) const {
   mutex_.lock();
+  if (status_ == ImageResponse::Status::Cancelled) {
+    mutex_.unlock();
+    return;
+  }
   imageData_ = imageResponse.getImage();
   imageMetadata_ = imageResponse.getMetadata();
-  react_native_assert(
-      status_ == ImageResponse::Status::Loading ||
-      status_ == ImageResponse::Status::Cancelled);
+  react_native_assert(status_ == ImageResponse::Status::Loading);
   status_ = ImageResponse::Status::Completed;
   auto observers = observers_;
   if (!observers.empty()) {
@@ -108,9 +112,11 @@ void ImageResponseObserverCoordinator::nativeImageResponseComplete(
 void ImageResponseObserverCoordinator::nativeImageResponseFailed(
     const ImageLoadError& loadError) const {
   mutex_.lock();
-  react_native_assert(
-      status_ == ImageResponse::Status::Loading ||
-      status_ == ImageResponse::Status::Cancelled);
+  if (status_ == ImageResponse::Status::Cancelled) {
+    mutex_.unlock();
+    return;
+  }
+  react_native_assert(status_ == ImageResponse::Status::Loading);
   status_ = ImageResponse::Status::Failed;
   imageErrorData_ = loadError.getError();
   auto observers = observers_;
